@@ -1,7 +1,11 @@
 .PHONY: all help init build run test clean dist
 
-GOCMD     = go
+VERSION  := $(shell git describe --tags)
+REVISION := $(shell git rev-parse --short HEAD)
+NAME     := $(shell basename "$(PWD)")
+SRCS     := $(shell find . -type f -name '*.go')
 
+GOCMD     = go
 GOBUILD   = $(GOCMD) build
 GOCLEAN   = $(GOCMD) clean
 GOTEST    = $(GOCMD) test
@@ -12,15 +16,12 @@ GOMOD     = $(GOCMD) mod
 BUILDDIR  = ./build
 BINDIR    = $(BUILDDIR)/bin
 PKGDIR    = $(BUILDDIR)/pkg
+LDFLAGS  := -ldflags="-s -w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(REVISION)\" -extldflags \"-static\""
 
-NAME      = okutil
-VERSION   = 0.0.1
-GOFILES  := $(shell find . -type f -name '*.go')
 GOXOS     = linux
 GOXARCH   = amd64
 OUTBIN    = $(BINDIR)/$(NAME)
 DISTBIN   = $(PKGDIR)/$(GOXOS)_$(GOXARCH)/$(NAME)
-
 
 all: help
 
@@ -45,7 +46,7 @@ clean:
 build: init
 	@echo build binary
 	rm -rf $(BINDIR)/*
-	$(GOBUILD) -o $(OUTBIN) $(GOFILES)
+	$(GOBUILD) $(LDFLAGS) -o $(OUTBIN) $(SRCS)
 
 test: build
 	@echo build and run test
@@ -53,5 +54,5 @@ test: build
 dist: init
 	@echo build $(GOXOS)_$(GOXARCH) binary
 	rm -rf $(PKGDIR)/*
-	GOOS=$(GOXOS) GOARCH=$(GOXARCH) $(GOBUILD) -o $(DISTBIN) $(GOFILES)
+	GOOS=$(GOXOS) GOARCH=$(GOXARCH) $(GOBUILD) $(LDFLAGS) -o $(DISTBIN) $(SRCS)
 
