@@ -1,4 +1,4 @@
-.PHONY: all help init build run clean dist
+.PHONY: all help init build run test clean dist
 
 GOCMD     = go
 
@@ -15,7 +15,7 @@ PKGDIR    = $(BUILDDIR)/pkg
 
 NAME      = okutil
 VERSION   = 0.0.1
-ENTRY     = ./$(NAME).go
+GOFILES  := $(shell find . -type f -name '*.go')
 GOXOS     = linux
 GOXARCH   = amd64
 OUTBIN    = $(BINDIR)/$(NAME)
@@ -29,8 +29,7 @@ help:
 	@echo "    init                       go mod init dependencies"
 	@echo "    clean                      clean build output"
 	@echo "    build                      compile binary"
-	@echo "    run                        build and run $(OUTBIN)"
-	@echo "    main                       run $(ENTRY) directly"
+	@echo "    test                       run test"
 	@echo "    dist                       compile and generate $(GOXOS)_$(GOXARCH) binary"
 
 init:
@@ -46,18 +45,13 @@ clean:
 build: init
 	@echo build binary
 	rm -rf $(BINDIR)/*
-	$(GOBUILD) -o $(OUTBIN) $(ENTRY)
+	$(GOBUILD) -o $(OUTBIN) $(GOFILES)
 
-run: build
-	@echo build and run $(OUTBIN)
-	$(OUTBIN)
-
-main: init
-	@echo $(GORUN) $(ENTRY)
-	$(GORUN) $(ENTRY)
+test: build
+	@echo build and run test
 
 dist: init
 	@echo build $(GOXOS)_$(GOXARCH) binary
 	rm -rf $(PKGDIR)/*
-	GOOS=$(GOXOS) GOARCH=$(GOXARCH) $(GOBUILD) -o $(DISTBIN) $(ENTRY)
+	GOOS=$(GOXOS) GOARCH=$(GOXARCH) $(GOBUILD) -o $(DISTBIN) $(GOFILES)
 
