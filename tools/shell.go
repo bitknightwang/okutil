@@ -1,4 +1,4 @@
-package oksys
+package tools
 
 import (
 	"archive/zip"
@@ -9,8 +9,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-
-	"github.com/bitknightwang/okutil/oklog"
 )
 
 func Contains(list []string, element string) bool {
@@ -36,19 +34,19 @@ func RunShellCommand(cmd string, args ...string) (string, error) {
 
 	if err != nil {
 		output := fmt.Sprintf("Error on running %v %v", cmd, args)
-		oklog.Errorf(output+"\n%v", err)
+		Errorf(output+"\n%v", err)
 		return output, err
 	}
 
 	output := string(out)
-	oklog.Debugf("Command: %s %v\nOutput:\n%s", cmd, args, output)
+	Debugf("Command: %s %v\nOutput:\n%s", cmd, args, output)
 	// return output, nil
 	return strings.TrimSpace(strings.TrimRight(output, "\n")), nil
 }
 
 func MakeDirs(path string, mode os.FileMode) error {
 	if len(path) == 0 {
-		oklog.Errorf("Illegal path %v", path)
+		Errorf("Illegal path %v", path)
 		return errors.New("empty path")
 	}
 
@@ -62,7 +60,7 @@ func MakeDirs(path string, mode os.FileMode) error {
 	}
 
 	if err := os.MkdirAll(path, mode); err != nil {
-		oklog.Errorf("Failed to create dir %v\n%v", path, err)
+		Errorf("Failed to create dir %v\n%v", path, err)
 		return err
 	}
 	return nil
@@ -71,12 +69,12 @@ func MakeDirs(path string, mode os.FileMode) error {
 func Rename(before, after string) error {
 	if len(before) == 0 || len(after) == 0 {
 		errMsg := fmt.Sprintf("Illegal input before:%v after:%v", before, after)
-		oklog.Error(errMsg)
+		Error(errMsg)
 		return errors.New(errMsg)
 	}
 
 	if err := os.Rename(before, after); err != nil {
-		oklog.Errorf("Failed to rename %v to %v\n%v", before, after, err)
+		Errorf("Failed to rename %v to %v\n%v", before, after, err)
 		return err
 	}
 
@@ -85,12 +83,12 @@ func Rename(before, after string) error {
 
 func Delete(path string) error {
 	if len(path) == 0 {
-		oklog.Errorf("Illegal path %v", path)
+		Errorf("Illegal path %v", path)
 		return errors.New("Empty path")
 	}
 
 	if err := os.RemoveAll(path); err != nil {
-		oklog.Errorf("Failed to delete %v\n%v", path, err)
+		Errorf("Failed to delete %v\n%v", path, err)
 		return err
 	}
 	return nil
@@ -103,7 +101,7 @@ func IsDir(path string) bool {
 
 	fi, err := os.Stat(path)
 	if err != nil {
-		oklog.Errorf("%v\n", err)
+		Errorf("%v\n", err)
 		return false
 	}
 	return fi.Mode().IsDir()
@@ -116,7 +114,7 @@ func IsFile(path string) bool {
 
 	fi, err := os.Stat(path)
 	if err != nil {
-		oklog.Errorf("%v\n", err)
+		Errorf("%v\n", err)
 		return false
 	}
 	return fi.Mode().IsRegular()
@@ -187,7 +185,7 @@ func SoftLink(source, target string, force bool) error {
 				return fmt.Errorf("failed to unlink: %v", err)
 			}
 		} else {
-			oklog.Warnf("overwrite existing symlink %v", target)
+			Warnf("overwrite existing symlink %v", target)
 		}
 	}
 

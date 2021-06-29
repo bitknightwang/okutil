@@ -1,4 +1,4 @@
-package okaws
+package tools
 
 import (
 	"os"

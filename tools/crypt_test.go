@@ -1,4 +1,4 @@
-package okcrypt
+package tools
 
 import "testing"
 

@@ -1,6 +1,7 @@
 .PHONY: all help init build run test clean dist
 
-VERSION  := $(shell git describe --tags)
+# VERSION  := $(shell git describe --tags)
+VERSION   = 0.2.1
 REVISION := $(shell git rev-parse --short HEAD)
 NAME     := $(shell basename "$(PWD)")
 SRCS     := $(shell find . -type f -name '*.go')
@@ -20,8 +21,8 @@ LDFLAGS  := -ldflags="-s -w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(
 
 GOXOS     = linux
 GOXARCH   = amd64
-OUTBIN    = $(BINDIR)/$(NAME)
-DISTBIN   = $(PKGDIR)/$(GOXOS)_$(GOXARCH)/$(NAME)
+OUTBIN    = $(BINDIR)/$(NAME)-$(VERSION)-bin
+DISTBIN   = $(PKGDIR)/$(GOXOS)_$(GOXARCH)/$(NAME)_$(GOXOS)_$(GOXARCH)-$(VERSION)-bin
 
 all: help
 

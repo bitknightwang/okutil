@@ -1,4 +1,4 @@
-package oklog
+package tools
 
 import (
 	"fmt"

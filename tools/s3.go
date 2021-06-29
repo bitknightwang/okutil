@@ -1,4 +1,4 @@
-package okaws
+package tools
 
 import (
 	"fmt"
@@ -10,21 +10,18 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-
-	"github.com/bitknightwang/okutil/oklog"
-	"github.com/bitknightwang/okutil/oksys"
 )
 
 func DownloadS3Object(bucket, objectKey, savePath string, isProd bool) error {
 	sess, err := CreateAWSSession(isProd)
 	if err != nil {
-		oklog.Errorf("Failed to create AWS session\n%v", err)
+		Errorf("Failed to create AWS session\n%v", err)
 		return err
 	}
 
 	downloadFile, err := os.Create(savePath)
 	if err != nil {
-		oklog.Errorf("Failed to create save file %v\n%v", savePath, err)
+		Errorf("Failed to create save file %v\n%v", savePath, err)
 		return err
 	}
 
@@ -35,22 +32,22 @@ func DownloadS3Object(bucket, objectKey, savePath string, isProd bool) error {
 	})
 
 	if err != nil {
-		oklog.Errorf("Failed to download s3://%v%v -> %v\n%v", bucket, objectKey, savePath, err)
+		Errorf("Failed to download s3://%v%v -> %v\n%v", bucket, objectKey, savePath, err)
 		return err
 	}
-	oklog.Debugf("file downloaded, %d bytes", fileSize)
+	Debugf("file downloaded, %d bytes", fileSize)
 
 	return nil
 }
 
 func UploadFileToS3(path, bucket, objectKey string, isProd bool) error {
-	if !oksys.IsFile(path) {
+	if !IsFile(path) {
 		return fmt.Errorf("%v is not a file", path)
 	}
 
 	sess, err := CreateAWSSession(isProd)
 	if err != nil {
-		oklog.Errorf("Failed to create AWS session\n%v", err)
+		Errorf("Failed to create AWS session\n%v", err)
 		return err
 	}
 
@@ -80,14 +77,14 @@ func UploadFileToS3(path, bucket, objectKey string, isProd bool) error {
 		return err
 	}
 
-	oklog.Debugf("%v\n", result)
+	Debugf("%v\n", result)
 	return nil
 }
 
 // ExistsS3Object check file or directory exists in specified s3 bucket
 func ExistsInS3(sess *session.Session, bucket, path string) bool {
 	if len(bucket) == 0 || len(path) == 0 {
-		oklog.Errorf("empty bucket %v or path %v", bucket, path)
+		Errorf("empty bucket %v or path %v", bucket, path)
 		return false
 	}
 
@@ -105,11 +102,11 @@ func ExistsInS3(sess *session.Session, bucket, path string) bool {
 	})
 
 	if err != nil {
-		oklog.Warnf("%v does not exist in %v, error: %v", objectKey, bucket, err)
+		Warnf("%v does not exist in %v, error: %v", objectKey, bucket, err)
 		return false
 	}
 
-	oklog.Debugf("%v check exists in %v result_count:%v", objectKey, bucket, *result.KeyCount)
+	Debugf("%v check exists in %v result_count:%v", objectKey, bucket, *result.KeyCount)
 
 	return *result.KeyCount > 0
 }
@@ -117,7 +114,7 @@ func ExistsInS3(sess *session.Session, bucket, path string) bool {
 func ExistsS3Object(bucket, objectKey string, isProd bool) bool {
 	sess, err := CreateAWSSession(isProd)
 	if err != nil {
-		oklog.Errorf("Failed to create AWS session\n%v", err)
+		Errorf("Failed to create AWS session\n%v", err)
 		return false
 	}
 
@@ -130,7 +127,7 @@ func ExistsS3Object(bucket, objectKey string, isProd bool) bool {
 func UploadDirToS3(dir, bucket, objectKey string, isProd bool) error {
 	sess, err := CreateAWSSession(isProd)
 	if err != nil {
-		oklog.Errorf("Failed to create AWS session\n%v", err)
+		Errorf("Failed to create AWS session\n%v", err)
 		return err
 	}
 
@@ -138,7 +135,7 @@ func UploadDirToS3(dir, bucket, objectKey string, isProd bool) error {
 }
 
 func UploadDirToS3WithSession(sess *session.Session, dir, bucket, objectKey string) error {
-	if !oksys.IsDir(dir) {
+	if !IsDir(dir) {
 		return fmt.Errorf("%v is not a directory", dir)
 	}
 
@@ -149,7 +146,7 @@ func UploadDirToS3WithSession(sess *session.Session, dir, bucket, objectKey stri
 	if err := uploader.UploadWithIterator(aws.BackgroundContext(), di); err != nil {
 		return fmt.Errorf("failed to upload %v\n%v", dir, err)
 	}
-	oklog.Debugf("successfully uploaded %v to s3://%v%v", dir, bucket, objectKey)
+	Debugf("successfully uploaded %v to s3://%v%v", dir, bucket, objectKey)
 
 	return nil
 }
@@ -177,7 +174,7 @@ func NewDirectoryIterator(bucket, objectKey, dir string) s3manager.BatchUploadIt
 		return nil
 	})
 	if err != nil {
-		oklog.Errorf("error walking the path %q: %v\n", dir, err)
+		Errorf("error walking the path %q: %v\n", dir, err)
 		return nil
 	}
 
