@@ -1,4 +1,4 @@
-package tools
+package okutil
 
 import (
 	"bytes"

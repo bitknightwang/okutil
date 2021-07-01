@@ -1,4 +1,4 @@
-package tools
+package okutil
 
 import (
     "crypto/aes"
